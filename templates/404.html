@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Página não encontrada{% endblock %}
+
+{% block breadcrumb %}Página não encontrada{% endblock %}
+
+{% block content %}
+
+<section class="error-page">
+
+    <div class="error-container">
+
+        <!-- ILUSTRAÇÃO DO ERRO -->
+        <div class="error-illustration">
+
+            <div class="error-decoration error-decoration-one"></div>
+            <div class="error-decoration error-decoration-two"></div>
+
+            <div class="error-icon">
+
+                <i data-lucide="file-search"></i>
+
+            </div>
+
+            <span class="error-code">404</span>
+
+        </div>
+
+
+        <!-- MENSAGEM PRINCIPAL -->
+        <div class="error-content">
+
+            <span class="page-eyebrow">
+                ERRO DE NAVEGAÇÃO
+            </span>
+
+            <h1>Página não encontrada</h1>
+
+            <p>
+                A página que você está procurando não existe,
+                foi removida ou está temporariamente indisponível.
+            </p>
+
+            <p>
+                Não se preocupe. Você pode retornar ao painel
+                principal e continuar utilizando o MedControl.
+            </p>
+
+        </div>
+
+
+        <!-- BOTÕES DE NAVEGAÇÃO -->
+        <div class="error-actions">
+
+            <a href="{{ url_for('index') }}"
+               class="btn btn-primary">
+
+                <i data-lucide="layout-dashboard"></i>
+
+                Voltar ao dashboard
+
+            </a>
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                onclick="window.history.back()">
+
+                <i data-lucide="arrow-left"></i>
+
+                Voltar à página anterior
+
+            </button>
+
+        </div>
+
+
+        <!-- LINKS RÁPIDOS -->
+        <div class="error-links">
+
+            <span>Ou acesse diretamente:</span>
+
+            <div class="error-links-grid">
+
+                <a href="{{ url_for('pacientes') }}"
+                   class="error-link">
+
+                    <div class="error-link-icon stat-blue">
+
+                        <i data-lucide="users"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>Pacientes</strong>
+
+                        <small>Gerenciar pacientes</small>
+
+                    </div>
+
+                    <i data-lucide="chevron-right"
+                       class="error-link-arrow"></i>
+
+                </a>
+
+
+                <a href="{{ url_for('medicos') }}"
+                   class="error-link">
+
+                    <div class="error-link-icon stat-cyan">
+
+                        <i data-lucide="stethoscope"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>Médicos</strong>
+
+                        <small>Gerenciar profissionais</small>
+
+                    </div>
+
+                    <i data-lucide="chevron-right"
+                       class="error-link-arrow"></i>
+
+                </a>
+
+
+                <a href="{{ url_for('consultas') }}"
+                   class="error-link">
+
+                    <div class="error-link-icon stat-purple">
+
+                        <i data-lucide="calendar-days"></i>
+
+                    </div>
+
+                    <div>
+
+                        <strong>Consultas</strong>
+
+                        <small>Gerenciar agendamentos</small>
+
+                    </div>
+
+                    <i data-lucide="chevron-right"
+                       class="error-link-arrow"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- IDENTIDADE DO SISTEMA -->
+        <div class="error-footer">
+
+            <i data-lucide="shield-check"></i>
+
+            <span>MedControl — Sistema de Gestão Clínica</span>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

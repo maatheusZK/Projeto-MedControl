@@ -1,0 +1,494 @@
+
+{% extends "base.html" %}
+
+{% block title %}Médicos{% endblock %}
+
+{% block breadcrumb %}Médicos{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE PROFISSIONAIS
+        </span>
+
+        <h1>Médicos</h1>
+
+        <p>
+            Cadastre, organize e gerencie os profissionais
+            da sua clínica.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('novo_medico') }}"
+       class="btn btn-primary">
+
+        <i data-lucide="plus"></i>
+
+        Novo médico
+
+    </a>
+
+</section>
+
+
+<!-- CARDS DE INFORMAÇÕES -->
+<section class="summary-grid">
+
+    <!-- TOTAL DE MÉDICOS -->
+    <article class="summary-card">
+
+        <div class="summary-icon stat-blue">
+
+            <i data-lucide="stethoscope"></i>
+
+        </div>
+
+        <div class="summary-content">
+
+            <span>
+
+                {% if pesquisa %}
+                    Médicos encontrados
+                {% else %}
+                    Médicos cadastrados
+                {% endif %}
+
+            </span>
+
+            <h2>{{ medicos|length }}</h2>
+
+            <small>Profissionais exibidos no sistema</small>
+
+        </div>
+
+    </article>
+
+
+    <!-- ESPECIALIDADES -->
+    <article class="summary-card">
+
+        <div class="summary-icon stat-green">
+
+            <i data-lucide="heart-pulse"></i>
+
+        </div>
+
+        <div class="summary-content">
+
+            <span>Especialidades</span>
+
+            <h2>
+                {{ medicos|map(attribute='especialidade')|unique|list|length }}
+            </h2>
+
+            <small>Especialidades nos registros exibidos</small>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- PAINEL DE MÉDICOS -->
+<section class="panel doctors-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Lista de médicos</h2>
+
+            <p>
+                Consulte e gerencie os profissionais cadastrados.
+            </p>
+
+        </div>
+
+        <div class="panel-icon">
+
+            <i data-lucide="clipboard-list"></i>
+
+        </div>
+
+    </div>
+
+
+    <!-- BARRA DE PESQUISA -->
+    <div class="table-toolbar">
+
+        <form action="{{ url_for('medicos') }}"
+              method="GET"
+              class="search-form">
+
+            <div class="search-input">
+
+                <i data-lucide="search"></i>
+
+                <input
+                    type="search"
+                    name="pesquisa"
+                    id="pesquisa"
+                    placeholder="Pesquisar por nome, especialidade ou CRM..."
+                    value="{{ pesquisa }}"
+                    aria-label="Pesquisar médicos"
+                    autocomplete="off">
+
+                {% if pesquisa %}
+
+                    <a href="{{ url_for('medicos') }}"
+                       class="search-clear"
+                       title="Limpar pesquisa"
+                       aria-label="Limpar pesquisa">
+
+                        <i data-lucide="x"></i>
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                <i data-lucide="search"></i>
+
+                Pesquisar
+
+            </button>
+
+        </form>
+
+        <div class="sort-indicator">
+
+            <i data-lucide="arrow-down-a-z"></i>
+
+            <span>Ordenado por nome</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTADOS DA PESQUISA -->
+    {% if pesquisa %}
+
+        <div class="search-result-info">
+
+            <i data-lucide="info"></i>
+
+            <span>
+
+                {{ medicos|length }}
+
+                {% if medicos|length == 1 %}
+                    resultado encontrado
+                {% else %}
+                    resultados encontrados
+                {% endif %}
+
+                para <strong>"{{ pesquisa }}"</strong>.
+
+            </span>
+
+            <a href="{{ url_for('medicos') }}">
+
+                Limpar pesquisa
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- TABELA DE MÉDICOS -->
+    {% if medicos %}
+
+        <div class="table-responsive">
+
+            <table class="data-table doctors-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Médico</th>
+                        <th>Especialidade</th>
+                        <th>CRM</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for medico in medicos %}
+
+                        <tr>
+
+                            <!-- ID -->
+                            <td>
+
+                                <span class="record-id">
+
+                                    #{{ medico.id }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- NOME DO MÉDICO -->
+                            <td>
+
+                                <div class="table-person">
+
+                                    <div class="table-avatar doctor-avatar">
+
+                                        <i data-lucide="stethoscope"></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ medico.nome }}
+                                        </strong>
+
+                                        <small>
+                                            Profissional cadastrado
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- ESPECIALIDADE -->
+                            <td>
+
+                                <span class="specialty-badge">
+
+                                    <i data-lucide="heart-pulse"></i>
+
+                                    {{ medico.especialidade }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- CRM -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="badge-check"></i>
+
+                                    <span class="crm-number">
+
+                                        {{ medico.crm }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TELEFONE -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="phone"></i>
+
+                                    <span>
+
+                                        {{ medico.telefone }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- AÇÕES -->
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <!-- EDITAR -->
+                                    <a href="{{ url_for('editar_medico', id=medico.id) }}"
+                                       class="table-action action-edit"
+                                       title="Editar médico"
+                                       aria-label="Editar médico">
+
+                                        <i data-lucide="pencil"></i>
+
+                                    </a>
+
+
+                                    <!-- EXCLUIR -->
+                                    <form
+                                        action="{{ url_for('excluir_medico', id=medico.id) }}"
+                                        method="POST"
+                                        class="delete-form"
+                                        data-nome="{{ medico.nome }}"
+                                        data-tipo="médico"
+                                        onsubmit="return confirm('Deseja realmente excluir este médico?');">
+
+                                        <button
+                                            type="submit"
+                                            class="table-action action-delete"
+                                            title="Excluir médico"
+                                            aria-label="Excluir médico">
+
+                                            <i data-lucide="trash-2"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- RODAPÉ DA TABELA -->
+        <div class="table-footer">
+
+            <span>
+
+                Exibindo {{ medicos|length }}
+
+                {% if medicos|length == 1 %}
+                    médico
+                {% else %}
+                    médicos
+                {% endif %}
+
+            </span>
+
+            <div class="table-footer-info">
+
+                <i data-lucide="arrow-down-a-z"></i>
+
+                Ordenado por nome
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <!-- ESTADO VAZIO -->
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                {% if pesquisa %}
+
+                    <i data-lucide="search-x"></i>
+
+                {% else %}
+
+                    <i data-lucide="stethoscope"></i>
+
+                {% endif %}
+
+            </div>
+
+            {% if pesquisa %}
+
+                <h3>Nenhum médico encontrado</h3>
+
+                <p>
+                    Não encontramos profissionais com os
+                    dados informados. Tente outra pesquisa.
+                </p>
+
+                <a href="{{ url_for('medicos') }}"
+                   class="btn btn-outline">
+
+                    <i data-lucide="rotate-ccw"></i>
+
+                    Limpar pesquisa
+
+                </a>
+
+            {% else %}
+
+                <h3>Nenhum médico cadastrado</h3>
+
+                <p>
+                    Cadastre o primeiro profissional
+                    para começar a organizar os atendimentos.
+                </p>
+
+                <a href="{{ url_for('novo_medico') }}"
+                   class="btn btn-primary">
+
+                    <i data-lucide="plus"></i>
+
+                    Cadastrar médico
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- INFORMAÇÕES SOBRE O SISTEMA -->
+<div class="info-banner">
+
+    <div class="info-banner-icon">
+
+        <i data-lucide="shield-check"></i>
+
+    </div>
+
+    <div>
+
+        <strong>Gerenciamento de profissionais</strong>
+
+        <p>
+            Cada médico deve possuir um CRM único.
+            Profissionais com consultas vinculadas
+            não podem ser excluídos do sistema.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

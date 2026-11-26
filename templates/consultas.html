@@ -1,0 +1,853 @@
+
+{% extends "base.html" %}
+
+{% block title %}Consultas{% endblock %}
+
+{% block breadcrumb %}Consultas{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE ATENDIMENTOS
+        </span>
+
+        <h1>Consultas</h1>
+
+        <p>
+            Organize os agendamentos e acompanhe
+            os atendimentos da sua clínica.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('nova_consulta') }}"
+       class="btn btn-primary">
+
+        <i data-lucide="calendar-plus"></i>
+
+        Nova consulta
+
+    </a>
+
+</section>
+
+
+<!-- CONTADORES -->
+{% set total = consultas|length %}
+
+{% set agendadas = consultas
+    |selectattr('status', 'equalto', 'Agendada')
+    |list|length %}
+
+{% set concluidas = consultas
+    |selectattr('status', 'equalto', 'Concluída')
+    |list|length %}
+
+{% set canceladas = consultas
+    |selectattr('status', 'equalto', 'Cancelada')
+    |list|length %}
+
+
+<!-- CARDS DE ESTATÍSTICAS -->
+<section class="stats-grid consultation-stats">
+
+    <!-- TOTAL -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Total de consultas</span>
+
+            <div class="stat-icon stat-purple">
+
+                <i data-lucide="calendar-days"></i>
+
+            </div>
+
+        </div>
+
+        <h2>{{ total }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Registros exibidos</span>
+
+        </div>
+
+    </article>
+
+
+    <!-- AGENDADAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Agendadas</span>
+
+            <div class="stat-icon stat-blue">
+
+                <i data-lucide="clock"></i>
+
+            </div>
+
+        </div>
+
+        <h2>{{ agendadas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Aguardando atendimento</span>
+
+        </div>
+
+    </article>
+
+
+    <!-- CONCLUÍDAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Concluídas</span>
+
+            <div class="stat-icon stat-green">
+
+                <i data-lucide="circle-check"></i>
+
+            </div>
+
+        </div>
+
+        <h2>{{ concluidas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Atendimentos realizados</span>
+
+        </div>
+
+    </article>
+
+
+    <!-- CANCELADAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Canceladas</span>
+
+            <div class="stat-icon stat-red">
+
+                <i data-lucide="circle-x"></i>
+
+            </div>
+
+        </div>
+
+        <h2>{{ canceladas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Atendimentos cancelados</span>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- PAINEL DE CONSULTAS -->
+<section class="panel consultations-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Agenda de consultas</h2>
+
+            <p>
+                Consulte e gerencie os atendimentos registrados.
+            </p>
+
+        </div>
+
+        <div class="panel-icon">
+
+            <i data-lucide="calendar-range"></i>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTROS -->
+    <div class="filters-container">
+
+        <div class="filters-heading">
+
+            <i data-lucide="list-filter"></i>
+
+            <h3>Filtros de pesquisa</h3>
+
+        </div>
+
+        <form action="{{ url_for('consultas') }}"
+              method="GET"
+              class="filters-form">
+
+            <div class="filters-grid">
+
+                <!-- FILTRO POR MÉDICO -->
+                <div class="form-group">
+
+                    <label for="medico_id">
+
+                        Médico
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="stethoscope"></i>
+
+                        <select name="medico_id"
+                                id="medico_id">
+
+                            <option value="">
+                                Todos os médicos
+                            </option>
+
+                            {% for medico in medicos %}
+
+                                <option
+                                    value="{{ medico.id }}"
+                                    {% if medico_id|string == medico.id|string %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ medico.nome }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FILTRO POR DATA -->
+                <div class="form-group">
+
+                    <label for="data">
+
+                        Data da consulta
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="calendar"></i>
+
+                        <input
+                            type="date"
+                            name="data"
+                            id="data"
+                            value="{{ data_filtro or '' }}">
+
+                    </div>
+
+                </div>
+
+
+                <!-- FILTRO POR STATUS -->
+                <div class="form-group">
+
+                    <label for="status">
+
+                        Status
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="activity"></i>
+
+                        <select name="status"
+                                id="status">
+
+                            <option value="">
+                                Todos os status
+                            </option>
+
+                            {% for situacao in status_validos %}
+
+                                <option
+                                    value="{{ situacao }}"
+                                    {% if status == situacao %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ situacao }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES DOS FILTROS -->
+            <div class="filter-actions">
+
+                <a href="{{ url_for('consultas') }}"
+                   class="btn btn-outline">
+
+                    <i data-lucide="rotate-ccw"></i>
+
+                    Limpar filtros
+
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    <i data-lucide="filter"></i>
+
+                    Filtrar consultas
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- INFORMAÇÕES DOS FILTROS -->
+    {% if medico_id or data_filtro or status %}
+
+        <div class="search-result-info">
+
+            <i data-lucide="info"></i>
+
+            <span>
+
+                {{ consultas|length }}
+
+                {% if consultas|length == 1 %}
+                    consulta encontrada
+                {% else %}
+                    consultas encontradas
+                {% endif %}
+
+                com os filtros selecionados.
+
+            </span>
+
+            <a href="{{ url_for('consultas') }}">
+
+                Limpar filtros
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- TABELA DE CONSULTAS -->
+    {% if consultas %}
+
+        <div class="table-responsive">
+
+            <table class="data-table consultations-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Médico</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Status</th>
+                        <th>Alterar status</th>
+                        <th>Ações</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for consulta in consultas %}
+
+                        <tr>
+
+                            <!-- ID -->
+                            <td>
+
+                                <span class="record-id">
+
+                                    #{{ consulta.id }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- PACIENTE -->
+                            <td>
+
+                                <div class="table-person">
+
+                                    <div class="table-avatar">
+
+                                        {{ consulta.paciente.nome[0]|upper }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            {{ consulta.paciente.nome }}
+
+                                        </strong>
+
+                                        <small>
+
+                                            Paciente #{{ consulta.paciente.id }}
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- MÉDICO -->
+                            <td>
+
+                                <div class="table-person">
+
+                                    <div class="table-avatar doctor-avatar">
+
+                                        <i data-lucide="stethoscope"></i>
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+
+                                            {{ consulta.medico.nome }}
+
+                                        </strong>
+
+                                        <small>
+
+                                            {{ consulta.medico.especialidade }}
+
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DATA -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="calendar"></i>
+
+                                    <span>
+
+                                        {{ consulta.data.strftime('%d/%m/%Y') }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- HORÁRIO -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="clock"></i>
+
+                                    <span>
+
+                                        {{ consulta.horario.strftime('%H:%M') }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- STATUS ATUAL -->
+                            <td>
+
+                                {% if consulta.status == 'Agendada' %}
+
+                                    <span class="status-badge status-agendada">
+
+                                        <span class="badge-dot"></span>
+
+                                        Agendada
+
+                                    </span>
+
+                                {% elif consulta.status == 'Concluída' %}
+
+                                    <span class="status-badge status-concluida">
+
+                                        <span class="badge-dot"></span>
+
+                                        Concluída
+
+                                    </span>
+
+                                {% elif consulta.status == 'Cancelada' %}
+
+                                    <span class="status-badge status-cancelada">
+
+                                        <span class="badge-dot"></span>
+
+                                        Cancelada
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge">
+
+                                        {{ consulta.status }}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ALTERAÇÃO RÁPIDA DE STATUS -->
+                            <td>
+
+                                <form
+                                    action="{{ url_for('alterar_status', id=consulta.id) }}"
+                                    method="POST"
+                                    class="status-form">
+
+                                    <select
+                                        name="status"
+                                        class="status-select"
+                                        aria-label="Alterar status da consulta {{ consulta.id }}">
+
+                                        {% for situacao in status_validos %}
+
+                                            <option
+                                                value="{{ situacao }}"
+                                                {% if consulta.status == situacao %}
+                                                    selected
+                                                {% endif %}>
+
+                                                {{ situacao }}
+
+                                            </option>
+
+                                        {% endfor %}
+
+                                    </select>
+
+                                    <button
+                                        type="submit"
+                                        class="table-action action-save"
+                                        title="Salvar status"
+                                        aria-label="Salvar status">
+
+                                        <i data-lucide="check"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+
+                            <!-- AÇÕES -->
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <!-- EDITAR -->
+                                    <a href="{{ url_for('editar_consulta', id=consulta.id) }}"
+                                       class="table-action action-edit"
+                                       title="Editar consulta"
+                                       aria-label="Editar consulta">
+
+                                        <i data-lucide="pencil"></i>
+
+                                    </a>
+
+
+                                    <!-- EXCLUIR -->
+                                    <form
+                                        action="{{ url_for('excluir_consulta', id=consulta.id) }}"
+                                        method="POST"
+                                        class="delete-form"
+                                        data-nome="{{ consulta.paciente.nome }}"
+                                        data-tipo="consulta"
+                                        onsubmit="return confirm('Deseja realmente excluir esta consulta?');">
+
+                                        <button
+                                            type="submit"
+                                            class="table-action action-delete"
+                                            title="Excluir consulta"
+                                            aria-label="Excluir consulta">
+
+                                            <i data-lucide="trash-2"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- RODAPÉ DA TABELA -->
+        <div class="table-footer">
+
+            <span>
+
+                Exibindo {{ consultas|length }}
+
+                {% if consultas|length == 1 %}
+                    consulta
+                {% else %}
+                    consultas
+                {% endif %}
+
+            </span>
+
+            <div class="table-footer-info">
+
+                <i data-lucide="calendar-days"></i>
+
+                Agenda de atendimentos
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <!-- ESTADO VAZIO -->
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                <i data-lucide="calendar-x"></i>
+
+            </div>
+
+            {% if medico_id or data_filtro or status %}
+
+                <h3>Nenhuma consulta encontrada</h3>
+
+                <p>
+                    Não existem consultas correspondentes
+                    aos filtros selecionados.
+                </p>
+
+                <a href="{{ url_for('consultas') }}"
+                   class="btn btn-outline">
+
+                    <i data-lucide="rotate-ccw"></i>
+
+                    Limpar filtros
+
+                </a>
+
+            {% else %}
+
+                <h3>Nenhuma consulta cadastrada</h3>
+
+                <p>
+                    Agende o primeiro atendimento para
+                    começar a organizar a rotina da clínica.
+                </p>
+
+                <a href="{{ url_for('nova_consulta') }}"
+                   class="btn btn-primary">
+
+                    <i data-lucide="calendar-plus"></i>
+
+                    Agendar consulta
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- LEGENDA DOS STATUS -->
+<section class="panel status-guide">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Status dos atendimentos</h2>
+
+            <p>
+                Entenda as situações disponíveis no sistema.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="status-guide-grid">
+
+        <!-- AGENDADA -->
+        <div class="status-guide-item">
+
+            <div class="summary-icon stat-blue">
+
+                <i data-lucide="clock"></i>
+
+            </div>
+
+            <div>
+
+                <h3>Agendada</h3>
+
+                <p>
+                    Consulta registrada que ainda
+                    aguarda atendimento.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONCLUÍDA -->
+        <div class="status-guide-item">
+
+            <div class="summary-icon stat-green">
+
+                <i data-lucide="circle-check"></i>
+
+            </div>
+
+            <div>
+
+                <h3>Concluída</h3>
+
+                <p>
+                    Atendimento realizado e finalizado.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- CANCELADA -->
+        <div class="status-guide-item">
+
+            <div class="summary-icon stat-red">
+
+                <i data-lucide="circle-x"></i>
+
+            </div>
+
+            <div>
+
+                <h3>Cancelada</h3>
+
+                <p>
+                    Atendimento cancelado e mantido
+                    no histórico do sistema.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- INFORMAÇÕES DO SISTEMA -->
+<div class="info-banner">
+
+    <div class="info-banner-icon">
+
+        <i data-lucide="shield-check"></i>
+
+    </div>
+
+    <div>
+
+        <strong>Controle de agendamentos</strong>
+
+        <p>
+            Cada consulta está vinculada a um paciente
+            e a um médico. O sistema verifica conflitos
+            de horários durante o agendamento.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

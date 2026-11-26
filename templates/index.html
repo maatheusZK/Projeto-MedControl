@@ -1,0 +1,794 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            PAINEL ADMINISTRATIVO
+        </span>
+
+        <h1>Visão geral</h1>
+
+        <p>
+            Acompanhe os indicadores e gerencie
+            sua clínica em um único lugar.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('nova_consulta') }}"
+       class="btn btn-primary">
+
+        <i data-lucide="plus"></i>
+        Nova consulta
+
+    </a>
+
+</section>
+
+
+<!-- CARDS DE ESTATÍSTICAS -->
+<section class="stats-grid">
+
+    <!-- PACIENTES -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Total de pacientes</span>
+
+            <div class="stat-icon stat-blue">
+                <i data-lucide="users"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ total_pacientes }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Pacientes cadastrados</span>
+
+            <a href="{{ url_for('pacientes') }}"
+               aria-label="Ver pacientes">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- MÉDICOS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Total de médicos</span>
+
+            <div class="stat-icon stat-cyan">
+                <i data-lucide="stethoscope"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ total_medicos }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Profissionais cadastrados</span>
+
+            <a href="{{ url_for('medicos') }}"
+               aria-label="Ver médicos">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- CONSULTAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Total de consultas</span>
+
+            <div class="stat-icon stat-purple">
+                <i data-lucide="calendar-days"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ total_consultas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Consultas registradas</span>
+
+            <a href="{{ url_for('consultas') }}"
+               aria-label="Ver consultas">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- AGENDADAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Consultas agendadas</span>
+
+            <div class="stat-icon stat-blue">
+                <i data-lucide="clock"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ agendadas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Aguardando atendimento</span>
+
+            <a href="{{ url_for('consultas', status='Agendada') }}"
+               aria-label="Ver consultas agendadas">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- CONCLUÍDAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Consultas concluídas</span>
+
+            <div class="stat-icon stat-green">
+                <i data-lucide="circle-check"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ concluidas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Atendimentos realizados</span>
+
+            <a href="{{ url_for('consultas', status='Concluída') }}"
+               aria-label="Ver consultas concluídas">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+
+    <!-- CANCELADAS -->
+    <article class="stat-card">
+
+        <div class="stat-card-header">
+
+            <span>Consultas canceladas</span>
+
+            <div class="stat-icon stat-red">
+                <i data-lucide="circle-x"></i>
+            </div>
+
+        </div>
+
+        <h2>{{ canceladas }}</h2>
+
+        <div class="stat-card-footer">
+
+            <span>Atendimentos cancelados</span>
+
+            <a href="{{ url_for('consultas', status='Cancelada') }}"
+               aria-label="Ver consultas canceladas">
+
+                <i data-lucide="arrow-up-right"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- RESUMO DO DIA -->
+<section class="daily-banner">
+
+    <div class="daily-banner-content">
+
+        <div class="daily-banner-icon">
+            <i data-lucide="calendar-check"></i>
+        </div>
+
+        <div>
+
+            <span class="daily-label">
+                AGENDA DE HOJE
+            </span>
+
+            <h2>
+                {{ consultas_hoje }}
+                {% if consultas_hoje == 1 %}
+                    consulta agendada
+                {% else %}
+                    consultas agendadas
+                {% endif %}
+            </h2>
+
+            <p>
+                Organize os atendimentos e acompanhe
+                a rotina da clínica.
+            </p>
+
+        </div>
+
+    </div>
+
+    <a href="{{ url_for('consultas') }}"
+       class="btn btn-banner">
+
+        Ver agenda
+        <i data-lucide="arrow-right"></i>
+
+    </a>
+
+</section>
+
+
+<!-- GRÁFICO E ACESSOS RÁPIDOS -->
+<section class="dashboard-grid">
+
+    <!-- GRÁFICO -->
+    <article class="panel chart-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Status das consultas</h2>
+
+                <p>
+                    Distribuição dos atendimentos registrados.
+                </p>
+
+            </div>
+
+            <div class="panel-icon">
+                <i data-lucide="chart-pie"></i>
+            </div>
+
+        </div>
+
+        {% if total_consultas > 0 %}
+
+            {% set percentual_agendadas =
+                (agendadas / total_consultas * 100) %}
+
+            {% set percentual_concluidas =
+                (concluidas / total_consultas * 100) %}
+
+            {% set percentual_canceladas =
+                (canceladas / total_consultas * 100) %}
+
+        {% else %}
+
+            {% set percentual_agendadas = 0 %}
+            {% set percentual_concluidas = 0 %}
+            {% set percentual_canceladas = 0 %}
+
+        {% endif %}
+
+        <div class="chart-content">
+
+            <div class="chart-wrapper">
+
+                <canvas
+                    id="consultasChart"
+                    data-agendadas="{{ agendadas }}"
+                    data-concluidas="{{ concluidas }}"
+                    data-canceladas="{{ canceladas }}"
+                    role="img"
+                    aria-label="Gráfico de status das consultas">
+
+                </canvas>
+
+                <div class="chart-center">
+
+                    <strong>{{ total_consultas }}</strong>
+
+                    <span>Consultas</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- LEGENDA -->
+            <div class="chart-legend">
+
+                <div class="legend-item">
+
+                    <div class="legend-label">
+
+                        <span class="legend-dot dot-blue"></span>
+
+                        Agendadas
+
+                    </div>
+
+                    <div class="legend-value">
+
+                        <strong>{{ agendadas }}</strong>
+
+                        <small>
+                            {{ "%.1f"|format(percentual_agendadas) }}%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <div class="legend-label">
+
+                        <span class="legend-dot dot-green"></span>
+
+                        Concluídas
+
+                    </div>
+
+                    <div class="legend-value">
+
+                        <strong>{{ concluidas }}</strong>
+
+                        <small>
+                            {{ "%.1f"|format(percentual_concluidas) }}%
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <div class="legend-label">
+
+                        <span class="legend-dot dot-red"></span>
+
+                        Canceladas
+
+                    </div>
+
+                    <div class="legend-value">
+
+                        <strong>{{ canceladas }}</strong>
+
+                        <small>
+                            {{ "%.1f"|format(percentual_canceladas) }}%
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </article>
+
+
+    <!-- ACESSO RÁPIDO -->
+    <article class="panel quick-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>Acesso rápido</h2>
+
+                <p>
+                    Principais funcionalidades do sistema.
+                </p>
+
+            </div>
+
+            <div class="panel-icon">
+                <i data-lucide="zap"></i>
+            </div>
+
+        </div>
+
+        <div class="quick-actions">
+
+            <a href="{{ url_for('novo_paciente') }}"
+               class="quick-action">
+
+                <div class="quick-icon stat-blue">
+                    <i data-lucide="user-plus"></i>
+                </div>
+
+                <div class="quick-text">
+
+                    <strong>Novo paciente</strong>
+
+                    <span>Cadastrar um paciente</span>
+
+                </div>
+
+                <i data-lucide="chevron-right"
+                   class="quick-arrow"></i>
+
+            </a>
+
+
+            <a href="{{ url_for('novo_medico') }}"
+               class="quick-action">
+
+                <div class="quick-icon stat-cyan">
+                    <i data-lucide="stethoscope"></i>
+                </div>
+
+                <div class="quick-text">
+
+                    <strong>Novo médico</strong>
+
+                    <span>Cadastrar um profissional</span>
+
+                </div>
+
+                <i data-lucide="chevron-right"
+                   class="quick-arrow"></i>
+
+            </a>
+
+
+            <a href="{{ url_for('nova_consulta') }}"
+               class="quick-action">
+
+                <div class="quick-icon stat-purple">
+                    <i data-lucide="calendar-plus"></i>
+                </div>
+
+                <div class="quick-text">
+
+                    <strong>Agendar consulta</strong>
+
+                    <span>Registrar um atendimento</span>
+
+                </div>
+
+                <i data-lucide="chevron-right"
+                   class="quick-arrow"></i>
+
+            </a>
+
+
+            <a href="{{ url_for('consultas') }}"
+               class="quick-action">
+
+                <div class="quick-icon stat-green">
+                    <i data-lucide="calendar-days"></i>
+                </div>
+
+                <div class="quick-text">
+
+                    <strong>Gerenciar agenda</strong>
+
+                    <span>Visualizar todas as consultas</span>
+
+                </div>
+
+                <i data-lucide="chevron-right"
+                   class="quick-arrow"></i>
+
+            </a>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- PRÓXIMAS CONSULTAS -->
+<section class="panel appointments-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Próximas consultas</h2>
+
+            <p>
+                Acompanhe os próximos atendimentos da clínica.
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('consultas') }}"
+           class="btn btn-outline">
+
+            Ver todas
+            <i data-lucide="arrow-right"></i>
+
+        </a>
+
+    </div>
+
+    {% if proximas_consultas %}
+
+        <div class="table-responsive">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Paciente</th>
+                        <th>Médico</th>
+                        <th>Especialidade</th>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for consulta in proximas_consultas %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="table-person">
+
+                                    <div class="table-avatar">
+
+                                        {{ consulta.paciente.nome[0]|upper }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ consulta.paciente.nome }}
+                                        </strong>
+
+                                        <small>
+                                            Paciente #{{ consulta.paciente.id }}
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+                                {{ consulta.medico.nome }}
+                            </td>
+
+                            <td>
+                                {{ consulta.medico.especialidade }}
+                            </td>
+
+                            <td>
+
+                                {{ consulta.data.strftime('%d/%m/%Y') }}
+
+                            </td>
+
+                            <td>
+
+                                {{ consulta.horario.strftime('%H:%M') }}
+
+                            </td>
+
+                            <td>
+
+                                <span class="status-badge status-agendada">
+
+                                    <span class="badge-dot"></span>
+
+                                    {{ consulta.status }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <a href="{{ url_for('editar_consulta', id=consulta.id) }}"
+                                   class="table-action action-edit"
+                                   title="Editar consulta"
+                                   aria-label="Editar consulta">
+
+                                    <i data-lucide="pencil"></i>
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <!-- ESTADO VAZIO -->
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                <i data-lucide="calendar-x"></i>
+            </div>
+
+            <h3>Nenhuma consulta agendada</h3>
+
+            <p>
+                Os próximos atendimentos aparecerão aqui
+                assim que forem cadastrados.
+            </p>
+
+            <a href="{{ url_for('nova_consulta') }}"
+               class="btn btn-primary">
+
+                <i data-lucide="plus"></i>
+
+                Agendar consulta
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<!-- BIBLIOTECA DE GRÁFICOS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const canvas = document.getElementById("consultasChart");
+
+        if (!canvas || typeof Chart === "undefined") {
+            return;
+        }
+
+        const agendadas = Number(canvas.dataset.agendadas);
+        const concluidas = Number(canvas.dataset.concluidas);
+        const canceladas = Number(canvas.dataset.canceladas);
+
+        const total = agendadas + concluidas + canceladas;
+
+        const dados = total > 0
+            ? [agendadas, concluidas, canceladas]
+            : [1];
+
+        const cores = total > 0
+            ? ["#2563eb", "#16a34a", "#ef4444"]
+            : ["#94a3b8"];
+
+        new Chart(canvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: total > 0
+                    ? ["Agendadas", "Concluídas", "Canceladas"]
+                    : ["Sem consultas"],
+
+                datasets: [{
+
+                    data: dados,
+
+                    backgroundColor: cores,
+
+                    borderWidth: 0,
+
+                    hoverOffset: 5,
+
+                    spacing: total > 0 ? 4 : 0,
+
+                    borderRadius: 5
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "78%",
+
+                animation: {
+
+                    animateRotate: true,
+
+                    duration: 1000
+
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        enabled: total > 0
+                    }
+
+                }
+
+            }
+
+        });
+
+    });
+
+</script>
+
+{% endblock %}

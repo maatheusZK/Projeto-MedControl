@@ -1,0 +1,660 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ 'Editar consulta' if consulta else 'Nova consulta' }}
+{% endblock %}
+
+{% block breadcrumb %}
+    {{ 'Editar consulta' if consulta else 'Nova consulta' }}
+{% endblock %}
+
+{% block content %}
+
+<!-- BOTÃO VOLTAR -->
+<a href="{{ url_for('consultas') }}"
+   class="back-link">
+
+    <i data-lucide="arrow-left"></i>
+
+    Voltar para consultas
+
+</a>
+
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE ATENDIMENTOS
+        </span>
+
+        {% if consulta %}
+
+            <h1>Editar consulta</h1>
+
+            <p>
+                Atualize as informações do atendimento
+                registrado na clínica.
+            </p>
+
+        {% else %}
+
+            <h1>Nova consulta</h1>
+
+            <p>
+                Preencha os dados para organizar
+                um novo atendimento.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% if consulta %}
+
+        <span class="record-id">
+
+            Registro #{{ consulta.id }}
+
+        </span>
+
+    {% endif %}
+
+</section>
+
+
+<!-- VALORES SELECIONADOS -->
+{% set paciente_selecionado = request.form.get(
+    'paciente_id',
+    consulta.paciente_id if consulta else ''
+) %}
+
+{% set medico_selecionado = request.form.get(
+    'medico_id',
+    consulta.medico_id if consulta else ''
+) %}
+
+{% set status_selecionado = request.form.get(
+    'status',
+    consulta.status if consulta else 'Agendada'
+) %}
+
+
+<!-- AVISO DE REGISTROS NECESSÁRIOS -->
+{% if not pacientes or not medicos %}
+
+    <div class="alert alert-warning">
+
+        <div class="alert-icon">
+
+            <i data-lucide="triangle-alert"></i>
+
+        </div>
+
+        <div class="alert-message">
+
+            Para agendar uma consulta, é necessário
+            possuir pelo menos um paciente e um médico
+            cadastrados no sistema.
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+<!-- ÁREA DO FORMULÁRIO -->
+<section class="form-layout">
+
+    <article class="panel form-panel">
+
+        <!-- CABEÇALHO DO FORMULÁRIO -->
+        <div class="form-panel-header">
+
+            <div class="form-header-icon stat-blue">
+
+                <i data-lucide="calendar-plus"></i>
+
+            </div>
+
+            <div>
+
+                <h2>Informações do agendamento</h2>
+
+                <p>
+                    Dados do paciente, profissional
+                    e horário do atendimento.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <form
+            action="{{ url_for('editar_consulta', id=consulta.id) if consulta else url_for('nova_consulta') }}"
+            method="POST"
+            class="standard-form"
+            id="form-consulta">
+
+
+            <div class="form-grid">
+
+                <!-- PACIENTE -->
+                <div class="form-group form-full">
+
+                    <label for="paciente_id">
+
+                        Paciente
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="users"></i>
+
+                        <select
+                            name="paciente_id"
+                            id="paciente_id"
+                            required>
+
+                            <option value=""
+                                    disabled
+                                    {% if not paciente_selecionado %}
+                                        selected
+                                    {% endif %}>
+
+                                Selecione um paciente
+
+                            </option>
+
+                            {% for paciente in pacientes %}
+
+                                <option
+                                    value="{{ paciente.id }}"
+                                    {% if paciente_selecionado|string == paciente.id|string %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ paciente.nome }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Paciente não cadastrado?
+
+                        <a href="{{ url_for('novo_paciente') }}">
+
+                            Cadastrar paciente
+
+                        </a>
+
+                    </small>
+
+                </div>
+
+
+                <!-- MÉDICO -->
+                <div class="form-group form-full">
+
+                    <label for="medico_id">
+
+                        Médico responsável
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="stethoscope"></i>
+
+                        <select
+                            name="medico_id"
+                            id="medico_id"
+                            required>
+
+                            <option value=""
+                                    disabled
+                                    {% if not medico_selecionado %}
+                                        selected
+                                    {% endif %}>
+
+                                Selecione um médico
+
+                            </option>
+
+                            {% for medico in medicos %}
+
+                                <option
+                                    value="{{ medico.id }}"
+                                    data-especialidade="{{ medico.especialidade }}"
+                                    data-crm="{{ medico.crm }}"
+                                    {% if medico_selecionado|string == medico.id|string %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ medico.nome }} -
+                                    {{ medico.especialidade }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Profissional não cadastrado?
+
+                        <a href="{{ url_for('novo_medico') }}">
+
+                            Cadastrar médico
+
+                        </a>
+
+                    </small>
+
+                </div>
+
+
+                <!-- DATA DA CONSULTA -->
+                <div class="form-group">
+
+                    <label for="data">
+
+                        Data da consulta
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="calendar"></i>
+
+                        <input
+                            type="date"
+                            name="data"
+                            id="data"
+                            value="{{ request.form.get('data', consulta.data.isoformat() if consulta else '') }}"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe a data do atendimento.
+
+                    </small>
+
+                </div>
+
+
+                <!-- HORÁRIO -->
+                <div class="form-group">
+
+                    <label for="horario">
+
+                        Horário
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="clock"></i>
+
+                        <input
+                            type="time"
+                            name="horario"
+                            id="horario"
+                            value="{{ request.form.get('horario', consulta.horario.strftime('%H:%M') if consulta else '') }}"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe o horário do atendimento.
+
+                    </small>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="form-group form-full">
+
+                    <label for="status">
+
+                        Status da consulta
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="activity"></i>
+
+                        <select
+                            name="status"
+                            id="status"
+                            required>
+
+                            {% for situacao in status_validos %}
+
+                                <option
+                                    value="{{ situacao }}"
+                                    {% if status_selecionado == situacao %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ situacao }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe a situação atual da consulta.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES DO FORMULÁRIO -->
+            <div class="form-footer">
+
+                <span class="required-info">
+
+                    <span class="required">*</span>
+
+                    Campos obrigatórios
+
+                </span>
+
+                <div class="form-actions">
+
+                    <a href="{{ url_for('consultas') }}"
+                       class="btn btn-outline">
+
+                        <i data-lucide="x"></i>
+
+                        Cancelar
+
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        {% if not pacientes or not medicos %}
+                            disabled
+                        {% endif %}>
+
+                        <i data-lucide="calendar-check"></i>
+
+                        {% if consulta %}
+
+                            Salvar alterações
+
+                        {% else %}
+
+                            Agendar consulta
+
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </article>
+
+
+    <!-- PAINEL LATERAL -->
+    <aside class="form-sidebar">
+
+        <!-- ORIENTAÇÕES -->
+        <article class="panel guidance-panel">
+
+            <div class="guidance-header">
+
+                <div class="guidance-icon stat-blue">
+
+                    <i data-lucide="info"></i>
+
+                </div>
+
+                <h3>Orientações</h3>
+
+            </div>
+
+            <p>
+                Confira os dados antes de registrar
+                o atendimento.
+            </p>
+
+            <ul class="guidance-list">
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Selecione um paciente cadastrado.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Escolha o profissional responsável.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Informe uma data e um horário válidos.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Verifique a disponibilidade do horário.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Mantenha o status da consulta atualizado.
+                    </span>
+
+                </li>
+
+            </ul>
+
+        </article>
+
+
+        <!-- RESUMO DO AGENDAMENTO -->
+        <article class="panel record-panel"
+                 id="resumo-consulta">
+
+            <div class="guidance-header">
+
+                <div class="guidance-icon stat-purple">
+
+                    <i data-lucide="clipboard-list"></i>
+
+                </div>
+
+                <h3>Resumo da consulta</h3>
+
+            </div>
+
+            <div class="record-details">
+
+                <!-- PACIENTE SELECIONADO -->
+                <div class="record-detail">
+
+                    <i data-lucide="user-round"></i>
+
+                    <span>Paciente</span>
+
+                    <strong id="resumo-paciente">
+
+                        {{ consulta.paciente.nome if consulta else 'Não selecionado' }}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- MÉDICO SELECIONADO -->
+                <div class="record-detail">
+
+                    <i data-lucide="stethoscope"></i>
+
+                    <span>Médico</span>
+
+                    <strong id="resumo-medico">
+
+                        {{ consulta.medico.nome if consulta else 'Não selecionado' }}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- ESPECIALIDADE -->
+                <div class="record-detail">
+
+                    <i data-lucide="heart-pulse"></i>
+
+                    <span>Especialidade</span>
+
+                    <strong id="resumo-especialidade">
+
+                        {{ consulta.medico.especialidade if consulta else 'Não selecionada' }}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- DATA -->
+                <div class="record-detail">
+
+                    <i data-lucide="calendar"></i>
+
+                    <span>Data</span>
+
+                    <strong id="resumo-data">
+
+                        {{ consulta.data.strftime('%d/%m/%Y') if consulta else 'Não informada' }}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- HORÁRIO -->
+                <div class="record-detail">
+
+                    <i data-lucide="clock"></i>
+
+                    <span>Horário</span>
+
+                    <strong id="resumo-horario">
+
+                        {{ consulta.horario.strftime('%H:%M') if consulta else 'Não informado' }}
+
+                    </strong>
+
+                </div>
+
+
+                <!-- STATUS -->
+                <div class="record-detail">
+
+                    <i data-lucide="activity"></i>
+
+                    <span>Status</span>
+
+                    <strong id="resumo-status">
+
+                        {{ status_selecionado }}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <!-- AVISO SOBRE AGENDAMENTOS -->
+        <div class="privacy-card">
+
+            <i data-lucide="shield-check"></i>
+
+            <div>
+
+                <strong>Controle de agendamentos</strong>
+
+                <p>
+                    O sistema verifica conflitos de horários
+                    para evitar agendamentos duplicados.
+                    Utilize somente dados fictícios.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+</section>
+
+{% endblock %}

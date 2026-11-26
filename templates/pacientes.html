@@ -1,0 +1,479 @@
+
+{% extends "base.html" %}
+
+{% block title %}Pacientes{% endblock %}
+
+{% block breadcrumb %}Pacientes{% endblock %}
+
+{% block content %}
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE PACIENTES
+        </span>
+
+        <h1>Pacientes</h1>
+
+        <p>
+            Cadastre, organize e gerencie os pacientes
+            da sua clínica.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('novo_paciente') }}"
+       class="btn btn-primary">
+
+        <i data-lucide="user-plus"></i>
+        Novo paciente
+
+    </a>
+
+</section>
+
+
+<!-- CARD DE INFORMAÇÕES -->
+<section class="summary-grid">
+
+    <article class="summary-card">
+
+        <div class="summary-icon stat-blue">
+
+            <i data-lucide="users"></i>
+
+        </div>
+
+        <div class="summary-content">
+
+            <span>
+                {% if pesquisa %}
+                    Pacientes encontrados
+                {% else %}
+                    Pacientes cadastrados
+                {% endif %}
+            </span>
+
+            <h2>{{ pacientes|length }}</h2>
+
+            <small>Registros exibidos no sistema</small>
+
+        </div>
+
+    </article>
+
+
+    <article class="summary-card">
+
+        <div class="summary-icon stat-green">
+
+            <i data-lucide="arrow-down-a-z"></i>
+
+        </div>
+
+        <div class="summary-content">
+
+            <span>Ordenação dos registros</span>
+
+            <h2>A — Z</h2>
+
+            <small>Ordem alfabética por nome</small>
+
+        </div>
+
+    </article>
+
+</section>
+
+
+<!-- PAINEL DE PACIENTES -->
+<section class="panel patients-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Lista de pacientes</h2>
+
+            <p>
+                Consulte e gerencie os registros cadastrados.
+            </p>
+
+        </div>
+
+        <div class="panel-icon">
+
+            <i data-lucide="clipboard-list"></i>
+
+        </div>
+
+    </div>
+
+
+    <!-- BARRA DE PESQUISA -->
+    <div class="table-toolbar">
+
+        <form action="{{ url_for('pacientes') }}"
+              method="GET"
+              class="search-form">
+
+            <div class="search-input">
+
+                <i data-lucide="search"></i>
+
+                <input
+                    type="search"
+                    name="pesquisa"
+                    id="pesquisa"
+                    placeholder="Pesquisar paciente por nome..."
+                    value="{{ pesquisa }}"
+                    aria-label="Pesquisar paciente por nome"
+                    autocomplete="off">
+
+                {% if pesquisa %}
+
+                    <a href="{{ url_for('pacientes') }}"
+                       class="search-clear"
+                       title="Limpar pesquisa"
+                       aria-label="Limpar pesquisa">
+
+                        <i data-lucide="x"></i>
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                <i data-lucide="search"></i>
+                Pesquisar
+
+            </button>
+
+        </form>
+
+        <div class="sort-indicator">
+
+            <i data-lucide="arrow-down-a-z"></i>
+
+            <span>Ordem alfabética</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTADOS DA PESQUISA -->
+    {% if pesquisa %}
+
+        <div class="search-result-info">
+
+            <i data-lucide="info"></i>
+
+            <span>
+
+                {{ pacientes|length }}
+                {% if pacientes|length == 1 %}
+                    resultado encontrado
+                {% else %}
+                    resultados encontrados
+                {% endif %}
+
+                para <strong>"{{ pesquisa }}"</strong>.
+
+            </span>
+
+            <a href="{{ url_for('pacientes') }}">
+                Limpar pesquisa
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- TABELA DE PACIENTES -->
+    {% if pacientes %}
+
+        <div class="table-responsive">
+
+            <table class="data-table patients-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>Nascimento</th>
+                        <th>Telefone</th>
+                        <th>E-mail</th>
+                        <th>Ações</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for paciente in pacientes %}
+
+                        <tr>
+
+                            <!-- ID -->
+                            <td>
+
+                                <span class="record-id">
+                                    #{{ paciente.id }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- NOME -->
+                            <td>
+
+                                <div class="table-person">
+
+                                    <div class="table-avatar">
+
+                                        {{ paciente.nome[0]|upper }}
+
+                                    </div>
+
+                                    <div>
+
+                                        <strong>
+                                            {{ paciente.nome }}
+                                        </strong>
+
+                                        <small>
+                                            Paciente cadastrado
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DATA DE NASCIMENTO -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="calendar"></i>
+
+                                    <span>
+
+                                        {{ paciente.data_nascimento.strftime('%d/%m/%Y') }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TELEFONE -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="phone"></i>
+
+                                    <span>
+                                        {{ paciente.telefone }}
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+                            <td>
+
+                                <div class="table-info">
+
+                                    <i data-lucide="mail"></i>
+
+                                    <span>
+                                        {{ paciente.email }}
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- AÇÕES -->
+                            <td>
+
+                                <div class="table-actions">
+
+                                    <!-- EDITAR -->
+                                    <a href="{{ url_for('editar_paciente', id=paciente.id) }}"
+                                       class="table-action action-edit"
+                                       title="Editar paciente"
+                                       aria-label="Editar paciente">
+
+                                        <i data-lucide="pencil"></i>
+
+                                    </a>
+
+
+                                    <!-- EXCLUIR -->
+                                    <form
+                                        action="{{ url_for('excluir_paciente', id=paciente.id) }}"
+                                        method="POST"
+                                        class="delete-form"
+                                        data-nome="{{ paciente.nome }}"
+                                        data-tipo="paciente"
+                                        onsubmit="return confirm('Deseja realmente excluir este paciente?');">
+
+                                        <button
+                                            type="submit"
+                                            class="table-action action-delete"
+                                            title="Excluir paciente"
+                                            aria-label="Excluir paciente">
+
+                                            <i data-lucide="trash-2"></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- RODAPÉ DA TABELA -->
+        <div class="table-footer">
+
+            <span>
+
+                Exibindo {{ pacientes|length }}
+
+                {% if pacientes|length == 1 %}
+                    paciente
+                {% else %}
+                    pacientes
+                {% endif %}
+
+            </span>
+
+            <div class="table-footer-info">
+
+                <i data-lucide="arrow-down-a-z"></i>
+
+                Ordenado por nome
+
+            </div>
+
+        </div>
+
+    {% else %}
+
+        <!-- ESTADO VAZIO -->
+        <div class="empty-state">
+
+            <div class="empty-icon">
+
+                {% if pesquisa %}
+
+                    <i data-lucide="search-x"></i>
+
+                {% else %}
+
+                    <i data-lucide="users"></i>
+
+                {% endif %}
+
+            </div>
+
+            {% if pesquisa %}
+
+                <h3>Nenhum paciente encontrado</h3>
+
+                <p>
+                    Não encontramos pacientes com o nome
+                    informado. Tente realizar outra pesquisa.
+                </p>
+
+                <a href="{{ url_for('pacientes') }}"
+                   class="btn btn-outline">
+
+                    <i data-lucide="rotate-ccw"></i>
+                    Limpar pesquisa
+
+                </a>
+
+            {% else %}
+
+                <h3>Nenhum paciente cadastrado</h3>
+
+                <p>
+                    Cadastre o primeiro paciente para começar
+                    a utilizar o gerenciamento da clínica.
+                </p>
+
+                <a href="{{ url_for('novo_paciente') }}"
+                   class="btn btn-primary">
+
+                    <i data-lucide="user-plus"></i>
+                    Cadastrar paciente
+
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- INFORMAÇÃO SOBRE O SISTEMA -->
+<div class="info-banner">
+
+    <div class="info-banner-icon">
+
+        <i data-lucide="shield-check"></i>
+
+    </div>
+
+    <div>
+
+        <strong>Gerenciamento de registros</strong>
+
+        <p>
+            Os pacientes são organizados automaticamente
+            em ordem alfabética. Pacientes com consultas
+            vinculadas não podem ser excluídos.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

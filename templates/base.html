@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="MedControl - Sistema de gestão de clínicas">
+
+    <title>
+        {% block title %}Dashboard{% endblock %} | MedControl
+    </title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- CSS principal -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Carregar tema antes da interface -->
+    <script>
+        try {
+            const tema = localStorage.getItem('medcontrol-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', tema);
+        } catch (erro) {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- SOBREPOSIÇÃO MOBILE -->
+        <div class="sidebar-overlay"
+             id="sidebar-overlay">
+        </div>
+
+        <!-- MENU LATERAL -->
+        <aside class="sidebar" id="sidebar">
+
+            <!-- LOGOTIPO -->
+            <a href="{{ url_for('index') }}"
+               class="sidebar-logo">
+
+                <div class="logo-icon">
+                    <i data-lucide="cross"></i>
+                </div>
+
+                <div class="logo-texto">
+                    <h1>Med<span>Control</span></h1>
+                    <p>Gestão de clínicas</p>
+                </div>
+
+            </a>
+
+            <!-- NAVEGAÇÃO -->
+            <nav class="sidebar-nav"
+                 aria-label="Menu principal">
+
+                <p class="nav-label">
+                    MENU PRINCIPAL
+                </p>
+
+                <a href="{{ url_for('index') }}"
+                   class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+
+                </a>
+
+                <a href="{{ url_for('pacientes') }}"
+                   class="nav-link {% if request.endpoint in ['pacientes', 'novo_paciente', 'editar_paciente'] %}active{% endif %}">
+
+                    <i data-lucide="users"></i>
+                    <span>Pacientes</span>
+
+                </a>
+
+                <a href="{{ url_for('medicos') }}"
+                   class="nav-link {% if request.endpoint in ['medicos', 'novo_medico', 'editar_medico'] %}active{% endif %}">
+
+                    <i data-lucide="stethoscope"></i>
+                    <span>Médicos</span>
+
+                </a>
+
+                <a href="{{ url_for('consultas') }}"
+                   class="nav-link {% if request.endpoint in ['consultas', 'nova_consulta', 'editar_consulta'] %}active{% endif %}">
+
+                    <i data-lucide="calendar-days"></i>
+                    <span>Consultas</span>
+
+                </a>
+
+                <p class="nav-label nav-label-secundaria">
+                    DESENVOLVIMENTO
+                </p>
+
+                <a href="{{ url_for('api_dashboard') }}"
+                   class="nav-link"
+                   target="_blank"
+                   rel="noopener noreferrer">
+
+                    <i data-lucide="code-2"></i>
+                    <span>API JSON</span>
+                    <i data-lucide="external-link"
+                       class="nav-external"></i>
+
+                </a>
+
+            </nav>
+
+            <!-- RODAPÉ DO MENU -->
+            <div class="sidebar-footer">
+
+                <div class="system-status">
+
+                    <span class="status-dot"></span>
+
+                    <div>
+                        <strong>Sistema online</strong>
+                        <small>MedControl v1.0</small>
+                    </div>
+
+                </div>
+
+                <div class="sidebar-user">
+
+                    <div class="user-avatar">
+                        <i data-lucide="user-round"></i>
+                    </div>
+
+                    <div class="user-info">
+                        <strong>Administrador</strong>
+                        <small>Gestão do sistema</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+        <div class="main-wrapper">
+
+            <!-- CABEÇALHO -->
+            <header class="topbar">
+
+                <div class="topbar-left">
+
+                    <button type="button"
+                            class="icon-button menu-toggle"
+                            id="menu-toggle"
+                            aria-label="Abrir menu"
+                            aria-controls="sidebar"
+                            aria-expanded="false">
+
+                        <i data-lucide="menu"></i>
+
+                    </button>
+
+                    <div class="breadcrumb">
+
+                        <span>MedControl</span>
+
+                        <i data-lucide="chevron-right"></i>
+
+                        <strong>
+                            {% block breadcrumb %}
+                                Visão geral
+                            {% endblock %}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="topbar-right">
+
+                    <!-- DATA ATUAL -->
+                    <div class="topbar-date">
+
+                        <i data-lucide="calendar"></i>
+
+                        <span id="data-atual"></span>
+
+                    </div>
+
+                    <!-- TEMA CLARO / ESCURO -->
+                    <button type="button"
+                            class="icon-button theme-toggle"
+                            id="theme-toggle"
+                            aria-label="Alternar tema"
+                            title="Alternar tema">
+
+                        <i data-lucide="moon"
+                           id="theme-icon"></i>
+
+                    </button>
+
+                    <div class="topbar-divider"></div>
+
+                    <!-- PERFIL -->
+                    <div class="topbar-profile">
+
+                        <div class="profile-avatar">
+                            A
+                        </div>
+
+                        <div class="profile-info">
+                            <strong>Administrador</strong>
+                            <small>MedControl</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- CONTEÚDO PRINCIPAL -->
+            <main class="main-content" id="main-content">
+
+                <!-- MENSAGENS FLASH -->
+                {% with mensagens = get_flashed_messages(with_categories=true) %}
+
+                    {% if mensagens %}
+
+                        <div class="alert-container"
+                             aria-live="polite">
+
+                            {% for categoria, mensagem in mensagens %}
+
+                                <div class="alert alert-{{ categoria }}"
+                                     role="alert">
+
+                                    <div class="alert-icon">
+
+                                        {% if categoria == 'success' %}
+
+                                            <i data-lucide="circle-check"></i>
+
+                                        {% elif categoria == 'danger' %}
+
+                                            <i data-lucide="circle-x"></i>
+
+                                        {% elif categoria == 'warning' %}
+
+                                            <i data-lucide="triangle-alert"></i>
+
+                                        {% else %}
+
+                                            <i data-lucide="info"></i>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="alert-message">
+                                        {{ mensagem }}
+                                    </div>
+
+                                    <button type="button"
+                                            class="alert-close"
+                                            aria-label="Fechar mensagem">
+
+                                        <i data-lucide="x"></i>
+
+                                    </button>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% endwith %}
+
+                <!-- CONTEÚDO DINÂMICO DAS PÁGINAS -->
+                {% block content %}
+                {% endblock %}
+
+            </main>
+
+            <!-- RODAPÉ -->
+            <footer class="main-footer">
+
+                <p>
+                    &copy; <span id="ano-atual">2026</span>
+                    MedControl.
+                    Todos os direitos reservados.
+                </p>
+
+                <div class="footer-info">
+
+                    <i data-lucide="shield-check"></i>
+
+                    <span>Projeto acadêmico · Dados fictícios</span>
+
+                </div>
+
+            </footer>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT PRINCIPAL -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- INICIALIZAÇÃO DOS ÍCONES -->
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

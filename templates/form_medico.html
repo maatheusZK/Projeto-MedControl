@@ -1,0 +1,474 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ 'Editar médico' if medico else 'Novo médico' }}
+{% endblock %}
+
+{% block breadcrumb %}
+    {{ 'Editar médico' if medico else 'Novo médico' }}
+{% endblock %}
+
+{% block content %}
+
+<!-- BOTÃO VOLTAR -->
+<a href="{{ url_for('medicos') }}"
+   class="back-link">
+
+    <i data-lucide="arrow-left"></i>
+
+    Voltar para médicos
+
+</a>
+
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE PROFISSIONAIS
+        </span>
+
+        {% if medico %}
+
+            <h1>Editar médico</h1>
+
+            <p>
+                Atualize as informações do profissional
+                cadastrado na clínica.
+            </p>
+
+        {% else %}
+
+            <h1>Novo médico</h1>
+
+            <p>
+                Preencha os dados para cadastrar
+                um novo profissional na clínica.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% if medico %}
+
+        <span class="record-id">
+
+            Registro #{{ medico.id }}
+
+        </span>
+
+    {% endif %}
+
+</section>
+
+
+<!-- ÁREA DO FORMULÁRIO -->
+<section class="form-layout">
+
+    <article class="panel form-panel">
+
+        <!-- CABEÇALHO DO FORMULÁRIO -->
+        <div class="form-panel-header">
+
+            <div class="form-header-icon stat-blue">
+
+                <i data-lucide="stethoscope"></i>
+
+            </div>
+
+            <div>
+
+                <h2>Informações profissionais</h2>
+
+                <p>
+                    Dados de identificação, especialidade
+                    e registro profissional.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <form
+            action="{{ url_for('editar_medico', id=medico.id) if medico else url_for('novo_medico') }}"
+            method="POST"
+            class="standard-form"
+            id="form-medico">
+
+
+            <div class="form-grid">
+
+                <!-- NOME COMPLETO -->
+                <div class="form-group form-full">
+
+                    <label for="nome">
+
+                        Nome completo
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="user-round"></i>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            placeholder="Digite o nome do profissional"
+                            value="{{ request.form.get('nome', medico.nome if medico else '') }}"
+                            maxlength="150"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe o nome completo do médico.
+
+                    </small>
+
+                </div>
+
+
+                <!-- ESPECIALIDADE -->
+                <div class="form-group form-full">
+
+                    <label for="especialidade">
+
+                        Especialidade
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="heart-pulse"></i>
+
+                        <input
+                            type="text"
+                            id="especialidade"
+                            name="especialidade"
+                            placeholder="Ex.: Cardiologia"
+                            value="{{ request.form.get('especialidade', medico.especialidade if medico else '') }}"
+                            list="lista-especialidades"
+                            maxlength="100"
+                            autocomplete="off"
+                            required>
+
+                        <datalist id="lista-especialidades">
+
+                            <option value="Cardiologia">
+                            <option value="Clínica Geral">
+                            <option value="Dermatologia">
+                            <option value="Endocrinologia">
+                            <option value="Gastroenterologia">
+                            <option value="Geriatria">
+                            <option value="Ginecologia">
+                            <option value="Neurologia">
+                            <option value="Oftalmologia">
+                            <option value="Ortopedia">
+                            <option value="Otorrinolaringologia">
+                            <option value="Pediatria">
+                            <option value="Pneumologia">
+                            <option value="Psiquiatria">
+                            <option value="Urologia">
+
+                        </datalist>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Selecione uma sugestão ou digite
+                        outra especialidade.
+
+                    </small>
+
+                </div>
+
+
+                <!-- CRM -->
+                <div class="form-group">
+
+                    <label for="crm">
+
+                        CRM
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="badge-check"></i>
+
+                        <input
+                            type="text"
+                            id="crm"
+                            name="crm"
+                            placeholder="Ex.: DEMO-005"
+                            value="{{ request.form.get('crm', medico.crm if medico else '') }}"
+                            maxlength="30"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        O CRM deve ser único no sistema.
+
+                    </small>
+
+                </div>
+
+
+                <!-- TELEFONE -->
+                <div class="form-group">
+
+                    <label for="telefone">
+
+                        Telefone
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="phone"></i>
+
+                        <input
+                            type="tel"
+                            id="telefone"
+                            name="telefone"
+                            class="phone-mask"
+                            placeholder="(00) 00000-0000"
+                            value="{{ request.form.get('telefone', medico.telefone if medico else '') }}"
+                            maxlength="20"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe o telefone com DDD.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES DO FORMULÁRIO -->
+            <div class="form-footer">
+
+                <span class="required-info">
+
+                    <span class="required">*</span>
+
+                    Campos obrigatórios
+
+                </span>
+
+                <div class="form-actions">
+
+                    <a href="{{ url_for('medicos') }}"
+                       class="btn btn-outline">
+
+                        <i data-lucide="x"></i>
+
+                        Cancelar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i data-lucide="save"></i>
+
+                        {% if medico %}
+
+                            Salvar alterações
+
+                        {% else %}
+
+                            Salvar médico
+
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </article>
+
+
+    <!-- PAINEL LATERAL -->
+    <aside class="form-sidebar">
+
+        <!-- ORIENTAÇÕES -->
+        <article class="panel guidance-panel">
+
+            <div class="guidance-header">
+
+                <div class="guidance-icon stat-blue">
+
+                    <i data-lucide="info"></i>
+
+                </div>
+
+                <h3>Orientações</h3>
+
+            </div>
+
+            <p>
+                Confira as informações profissionais
+                antes de salvar o cadastro.
+            </p>
+
+            <ul class="guidance-list">
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Preencha todos os campos obrigatórios.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Informe a especialidade do profissional.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Utilize um CRM fictício e exclusivo.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Confira o telefone informado.
+                    </span>
+
+                </li>
+
+            </ul>
+
+        </article>
+
+
+        <!-- INFORMAÇÕES DO REGISTRO -->
+        {% if medico %}
+
+            <article class="panel record-panel">
+
+                <div class="record-profile">
+
+                    <div class="record-avatar">
+
+                        <i data-lucide="stethoscope"></i>
+
+                    </div>
+
+                    <h3>{{ medico.nome }}</h3>
+
+                    <span>{{ medico.especialidade }}</span>
+
+                </div>
+
+                <div class="record-details">
+
+                    <div class="record-detail">
+
+                        <i data-lucide="badge-check"></i>
+
+                        <span>CRM</span>
+
+                        <strong>{{ medico.crm }}</strong>
+
+                    </div>
+
+                    <div class="record-detail">
+
+                        <i data-lucide="calendar-days"></i>
+
+                        <span>Consultas vinculadas</span>
+
+                        <strong>
+
+                            {{ medico.consultas|length }}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="record-detail">
+
+                        <i data-lucide="hash"></i>
+
+                        <span>ID do registro</span>
+
+                        <strong>#{{ medico.id }}</strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% endif %}
+
+
+        <!-- AVISO -->
+        <div class="privacy-card">
+
+            <i data-lucide="shield-check"></i>
+
+            <div>
+
+                <strong>Ambiente demonstrativo</strong>
+
+                <p>
+                    O MedControl é um projeto acadêmico.
+                    Utilize somente dados profissionais fictícios.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+</section>
+
+{% endblock %}

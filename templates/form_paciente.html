@@ -1,0 +1,419 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+    {{ 'Editar paciente' if paciente else 'Novo paciente' }}
+{% endblock %}
+
+{% block breadcrumb %}
+    {{ 'Editar paciente' if paciente else 'Novo paciente' }}
+{% endblock %}
+
+{% block content %}
+
+<!-- BOTÃO VOLTAR -->
+<a href="{{ url_for('pacientes') }}"
+   class="back-link">
+
+    <i data-lucide="arrow-left"></i>
+
+    Voltar para pacientes
+
+</a>
+
+
+<!-- CABEÇALHO DA PÁGINA -->
+<section class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-eyebrow">
+            GESTÃO DE PACIENTES
+        </span>
+
+        {% if paciente %}
+
+            <h1>Editar paciente</h1>
+
+            <p>
+                Atualize as informações do paciente cadastrado.
+            </p>
+
+        {% else %}
+
+            <h1>Novo paciente</h1>
+
+            <p>
+                Preencha os dados para cadastrar
+                um novo paciente na clínica.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% if paciente %}
+
+        <span class="record-id">
+
+            Registro #{{ paciente.id }}
+
+        </span>
+
+    {% endif %}
+
+</section>
+
+
+<!-- ÁREA DO FORMULÁRIO -->
+<section class="form-layout">
+
+    <article class="panel form-panel">
+
+        <!-- CABEÇALHO DO FORMULÁRIO -->
+        <div class="form-panel-header">
+
+            <div class="form-header-icon stat-blue">
+
+                {% if paciente %}
+
+                    <i data-lucide="user-round-pen"></i>
+
+                {% else %}
+
+                    <i data-lucide="user-plus"></i>
+
+                {% endif %}
+
+            </div>
+
+            <div>
+
+                <h2>Informações pessoais</h2>
+
+                <p>
+                    Dados de identificação e contato do paciente.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- FORMULÁRIO -->
+        <form
+            action="{{ url_for('editar_paciente', id=paciente.id) if paciente else url_for('novo_paciente') }}"
+            method="POST"
+            class="standard-form"
+            id="form-paciente">
+
+
+            <div class="form-grid">
+
+                <!-- NOME COMPLETO -->
+                <div class="form-group form-full">
+
+                    <label for="nome">
+
+                        Nome completo
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="user-round"></i>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            placeholder="Digite o nome completo"
+                            value="{{ request.form.get('nome', paciente.nome if paciente else '') }}"
+                            maxlength="150"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe o nome completo do paciente.
+
+                    </small>
+
+                </div>
+
+
+                <!-- DATA DE NASCIMENTO -->
+                <div class="form-group">
+
+                    <label for="data_nascimento">
+
+                        Data de nascimento
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="calendar"></i>
+
+                        <input
+                            type="date"
+                            id="data_nascimento"
+                            name="data_nascimento"
+                            value="{{ request.form.get('data_nascimento', paciente.data_nascimento.isoformat() if paciente else '') }}"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TELEFONE -->
+                <div class="form-group">
+
+                    <label for="telefone">
+
+                        Telefone
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="phone"></i>
+
+                        <input
+                            type="tel"
+                            id="telefone"
+                            name="telefone"
+                            class="phone-mask"
+                            placeholder="(00) 00000-0000"
+                            value="{{ request.form.get('telefone', paciente.telefone if paciente else '') }}"
+                            maxlength="20"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="form-group form-full">
+
+                    <label for="email">
+
+                        E-mail
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <i data-lucide="mail"></i>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="paciente@example.com"
+                            value="{{ request.form.get('email', paciente.email if paciente else '') }}"
+                            maxlength="150"
+                            autocomplete="off"
+                            required>
+
+                    </div>
+
+                    <small class="form-hint">
+
+                        Informe um endereço de e-mail válido.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOTÕES DO FORMULÁRIO -->
+            <div class="form-footer">
+
+                <span class="required-info">
+
+                    <span class="required">*</span>
+                    Campos obrigatórios
+
+                </span>
+
+                <div class="form-actions">
+
+                    <a href="{{ url_for('pacientes') }}"
+                       class="btn btn-outline">
+
+                        <i data-lucide="x"></i>
+
+                        Cancelar
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i data-lucide="save"></i>
+
+                        {% if paciente %}
+
+                            Salvar alterações
+
+                        {% else %}
+
+                            Salvar paciente
+
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </article>
+
+
+    <!-- PAINEL LATERAL DE ORIENTAÇÕES -->
+    <aside class="form-sidebar">
+
+        <article class="panel guidance-panel">
+
+            <div class="guidance-header">
+
+                <div class="guidance-icon stat-blue">
+
+                    <i data-lucide="info"></i>
+
+                </div>
+
+                <h3>Orientações</h3>
+
+            </div>
+
+            <p>
+                Confira as informações antes de salvar
+                o registro do paciente.
+            </p>
+
+            <ul class="guidance-list">
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Preencha todos os campos obrigatórios.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Informe uma data de nascimento válida.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Confira o telefone e o endereço de e-mail.
+                    </span>
+
+                </li>
+
+                <li>
+
+                    <i data-lucide="circle-check"></i>
+
+                    <span>
+                        Utilize somente informações fictícias.
+                    </span>
+
+                </li>
+
+            </ul>
+
+        </article>
+
+
+        <!-- INFORMAÇÕES DO REGISTRO -->
+        {% if paciente %}
+
+            <article class="panel record-panel">
+
+                <div class="record-profile">
+
+                    <div class="record-avatar">
+
+                        {{ paciente.nome[0]|upper }}
+
+                    </div>
+
+                    <h3>{{ paciente.nome }}</h3>
+
+                    <span>Paciente #{{ paciente.id }}</span>
+
+                </div>
+
+                <div class="record-details">
+
+                    <div class="record-detail">
+
+                        <i data-lucide="calendar-days"></i>
+
+                        <span>Consultas vinculadas</span>
+
+                        <strong>
+                            {{ paciente.consultas|length }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% endif %}
+
+
+        <!-- AVISO -->
+        <div class="privacy-card">
+
+            <i data-lucide="shield-check"></i>
+
+            <div>
+
+                <strong>Ambiente demonstrativo</strong>
+
+                <p>
+                    O MedControl é um projeto acadêmico.
+                    Não cadastre informações de pacientes reais.
+                </p>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+</section>
+
+{% endblock %}
